@@ -1,0 +1,26 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: Update Repo Index when Ansible Distribution is Ubuntu
+      apt: 
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+    # - name: Update Repo Index when Ansible Distribution is Ubuntu or Debian
+    #   apt: 
+    #     update_cache: yes
+    #   when: ansible_distribution in ["Debian", "Ubuntu"]
+
+    - name: Install Apache when Ansible Distribution is Ubuntu
+      apt:
+        name: apache2
+        state: latest
+      when: ansible_distribution == "Ubuntu"
+    
+    - name: Add PHP Support for Apache when Ansible Distribution is Ubuntu
+      apt:
+        name: libapache2-mod-php
+        state: latest
+      when: ansible_distribution == "Ubuntu"
