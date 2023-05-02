@@ -1,0 +1,23 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Update and Upgrade Package Manager, Install Apache2 and PHP
+      apt:
+        name:
+          - state: latest
+          - update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+
+# Install PHP AND APACHE2 on UBUNTU AND CENTOS
+# ---
+# - hosts: all
+#   become: true
+#   tasks:
+#     - name: Update and Upgrade Package Manager, Install Apache2 and PHP on Ubuntu and CENTOS
+#       package:
+#         name:
+#           - "{{ apache2_package }}"
+#           - "{{ php_package }}"
+#         state: latest
+#         update_cache: yes
