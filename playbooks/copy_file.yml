@@ -1,0 +1,12 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Copy html to apache webservers
+      tags: apache
+      copy:
+        src: ../files/site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0664
