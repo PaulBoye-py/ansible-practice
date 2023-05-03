@@ -2,6 +2,13 @@
 - hosts: all
   become: true
   tasks:
+
+    - name: Update and Upgrade Package Manager, Install Apache2 and PHP
+      apt:
+        name:
+          - state: latest
+          - update_cache: yes
+          
     - name: Copy html to apache webservers
       tags: apache
       copy:
@@ -10,3 +17,19 @@
         owner: root
         group: root
         mode: 0664
+
+- hosts: web_servers
+  become: true
+  tasks:
+    - name: Install Unzip
+      package:
+        name: unzip
+    
+    - name: Install terraform
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0755
