@@ -1,0 +1,82 @@
+---
+- hosts: all
+  become: true
+  tasks:
+
+    - name: Update and Upgrade Package Manager
+      tags: always
+      apt:
+          update_cache: yes
+      
+
+- hosts: web_servers
+  become: true
+  tasks:
+    - name: Install Apache2 and PHP
+      apt:
+        name:
+          - apache2
+          - libapache2-mod-php
+        state: latest
+
+    - name: Copy html to apache webservers
+      tags: apache
+      copy:
+        src: ../files/site.html
+        dest: /var/www/html/index.html
+        owner: root
+        group: root
+        mode: 0664
+    - name: Install Unzip
+      package:
+        name: unzip
+    
+    - name: Install terraform
+      unarchive:
+        src: https://releases.hashicorp.com/terraform/1.4.6/terraform_1.4.6_linux_amd64.zip
+        dest: /usr/local/bin
+        remote_src: yes
+        owner: root
+        group: root
+        mode: 0755
+
+- hosts: CentOS_servers
+  become: true
+  tasks:
+    - name: Update and Upgrade package Manager on CentOS servers
+      dnf:
+        update_only: yes
+        update_cache: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Install httpd and php on CentOS servers
+      dnf:
+        name:
+          - httpd
+          - php
+        state: latest
+      when: ansible_distribution == "CentOS"
+
+    - name: Start httpd
+      tags: centos, httpd
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Change email address
+      tags: centos, httpd
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regex: '^ServerAdmin'
+        line: ServerAdmin paul.ade@hotmail.net
+      when: ansible_distribution == "CentOS"
+      register: httpd
+
+    - name: Restart httpd
+      tags: centos, httpd
+      service:
+        name: httpd
+        state: restarted
+      when: httpd.changed
